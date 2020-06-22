@@ -9,7 +9,7 @@ RUN mkdir /log
 
 WORKDIR /duckling
 
-ADD stack.yaml .
+ADD stack.yaml duckling.cabal ./
 
 ENV LANG=C.UTF-8
 
