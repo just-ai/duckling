@@ -21,10 +21,14 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Text as Text
 
 import Duckling.Dimensions.Types
-import Duckling.Numeral.Helpers (parseInt)
+import Duckling.Numeral.Helpers (parseInt, isPositive, hasGrain, isNatural)
+import Duckling.Numeral.Types (NumeralData (..))
 import Duckling.Ordinal.Helpers
+import Duckling.Ordinal.Types (OrdinalData (..))
 import Duckling.Regex.Types
 import Duckling.Types
+import qualified Duckling.Numeral.Types as TNumeral
+import qualified Duckling.Ordinal.Types as TOrdinal
 
 ordinalsFirstthMap :: HashMap Text.Text Int
 ordinalsFirstthMap = HashMap.fromList
@@ -63,6 +67,22 @@ cardinalsMap = HashMap.fromList
   , ( "девяносто", 90 )
   ]
 
+cardinalsMapCut :: HashMap Text.Text Int
+cardinalsMapCut = HashMap.fromList
+  [ ( "двадцат", 20 )
+  , ( "тридцат", 30 )
+  , ( "сороков", 40 )
+  , ( "пятьдесят", 50 )
+  , ( "пятидесят", 50 )
+  , ( "шестьдесят", 60 )
+  , ( "шестидесят", 60 )
+  , ( "семьдесят", 70 )
+  , ( "семидесят", 70 )
+  , ( "восемьдесят", 80 )
+  , ( "восьмидесят", 80 )
+  , ( "девяност", 90 )
+  ]
+
 ruleOrdinalsFirstth :: Rule
 ruleOrdinalsFirstth = Rule
   { name = "ordinals (first..19th)"
@@ -75,9 +95,22 @@ ruleOrdinalsFirstth = Rule
       _ -> Nothing
   }
 
+ruleOrdinalsTens :: Rule
+ruleOrdinalsTens = Rule
+  { name = "ordinals (20, 30,..,90)"
+  , pattern =
+    [ regex "(двадцат|тридцат|сороков|пят(и|ь)десят|шест(и|ь)десят|сем(и|ь)десят|вос(емь|ьми)десят|девяност)(ая|о(го|е|й|(му|м)|ю)|ую|ы(е|й|(ми|м)|х))"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) -> do
+        ordinal <$> HashMap.lookup (Text.toLower match) cardinalsMapCut
+      _ -> Nothing
+  }
+      
+
 ruleOrdinal :: Rule
 ruleOrdinal = Rule
-  { name = "ordinal 21..99"
+  { name = "ordinals (composite, e.g. восемьдесят-пятый, сорок-седьмой, двадвать-девятый, тридцать-третий"
   , pattern =
     [ regex "(двадцать|тридцать|сорок|пятьдесят|шестьдесят|семьдесят|восемьдесят|девяносто)"
     , regex "(перв|втор|трет|четверт|пят|шест|седьм|восьм|девят)(ье(го|й)?|ого|ый|ой|ий|ая|ое|ья)"
@@ -103,9 +136,44 @@ ruleOrdinalDigits = Rule
       _ -> Nothing
   }
 
+rule100 :: Rule
+rule100 = Rule
+  { name = "ordinal 100"
+  , pattern =
+    [ regex "сот(ый|ого|ому|ом)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (m:_)):_) -> Just (ordinal 100)
+      _ -> Nothing
+  }
+
+ruleComposite :: Rule
+ruleComposite = Rule
+  { name = "ordinal composition"
+  , pattern =
+    [ Predicate $ and . sequence [hasGrain, isNatural]
+    , dimension Ordinal
+    ]
+  , prod = \tokens -> case tokens of
+      (Token Numeral NumeralData{TNumeral.value = val1, TNumeral.grain = Just g}:
+       Token Ordinal OrdinalData{TOrdinal.value = val2}:
+       _) -> do
+        case (10 ^ g) > val2 of
+          True -> Just . ordinal $ (floor val1) + val2
+          _ -> Nothing
+        -- (10 ** (fromIntegral g)) > val2
+        -- todo (10 ** fromIntegral g) > val2
+        -- val2 <- getIntValue token
+        -- ordinal $ val1 + val2
+      _ -> Nothing
+  }
+
 rules :: [Rule]
 rules =
   [ ruleOrdinal
+  , ruleOrdinalsTens
   , ruleOrdinalDigits
   , ruleOrdinalsFirstth
+  , rule100
+  , ruleComposite
   ]

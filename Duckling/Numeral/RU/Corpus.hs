@@ -63,6 +63,10 @@ allExamples = concat
              [ "11"
              , "одиннадцать"
              ]
+  , examples (NumeralValue 13)
+             [ "13"
+             , "тринадцать"
+             ]
   , examples (NumeralValue 14)
              [ "14"
              , "четырнадцать"
