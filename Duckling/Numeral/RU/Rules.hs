@@ -255,7 +255,7 @@ ruleInteger4 :: Rule
 ruleInteger4 = Rule
   { name = "integer (3..19)"
   , pattern =
-    [ regex "(три|четырнадцать|четыре|пятнадцать|пять|шестнадцать|шесть|семнадцать|семь|восемнадцать|восемь|девятнадцать|девять|десять|одиннадцать|двенадцать|тринадцать)"
+    [ regex "(тринадцать|три|четырнадцать|четыре|пятнадцать|пять|шестнадцать|шесть|семнадцать|семь|восемнадцать|восемь|девятнадцать|девять|десять|одиннадцать|двенадцать)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) ->
@@ -310,6 +310,87 @@ ruleIntegerWithThousandsSeparator = Rule
       _ -> Nothing
   }
 
+ruleHundreds :: Rule
+ruleHundreds = Rule
+  { name = "integer 100"
+  , pattern =
+    [ regex "сот(н(е(й|ю|)|и|ю|я((ми|м)|х|))|ен|)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) -> case Text.toLower match of
+        _  -> double 1e2 >>= withGrain 2 >>= withMultipliable
+      _ -> Nothing
+  }
+
+ruleThousands :: Rule
+ruleThousands = Rule
+  { name = "integer 1000"
+  , pattern =
+    [ regex "тысяч(а(ми|м|х|)|(е(й|ю|))|и|у|ью|)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) -> case Text.toLower match of
+        _          -> double 1e3 >>= withGrain 3 >>= withMultipliable
+      _ -> Nothing
+  }
+
+ruleMillionsBillions :: Rule
+ruleMillionsBillions = Rule
+  { name = "integer million/billion"
+  , pattern =
+    [ regex "(миллион|миллиард)(а(ми|м|х|)|е|о(в|м)|у|ы|)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) -> case Text.toLower match of
+        "миллион"  -> double 1e6 >>= withGrain 6 >>= withMultipliable
+        "миллиард"  -> double 1e9 >>= withGrain 9 >>= withMultipliable
+        _  -> Nothing
+      _ -> Nothing
+  }
+
+ruleSum :: Rule
+ruleSum = Rule
+  { name = "intersect 2 numbers"
+  , pattern =
+    [ Predicate $ and . sequence [hasGrain, isPositive]
+    , Predicate $ and . sequence [not . isMultipliable, isPositive]
+    ]
+  , prod = \tokens -> case tokens of
+      (Token Numeral NumeralData{TNumeral.value = val1, TNumeral.grain = Just g}:
+       Token Numeral NumeralData{TNumeral.value = val2}:
+       _) | (10 ** fromIntegral g) > val2 -> double $ val1 + val2
+      _ -> Nothing
+  }
+
+ruleSumAnd :: Rule
+ruleSumAnd = Rule
+  { name = "intersect 2 numbers (with and)"
+  , pattern =
+    [ Predicate $ and . sequence [hasGrain, isPositive]
+    , regex "и"
+    , Predicate $ and . sequence [not . isMultipliable, isPositive]
+    ]
+  , prod = \tokens -> case tokens of
+      (Token Numeral NumeralData{TNumeral.value = val1, TNumeral.grain = Just g}:
+       _:
+       Token Numeral NumeralData{TNumeral.value = val2}:
+       _) | (10 ** fromIntegral g) > val2 -> double $ val1 + val2
+      _ -> Nothing
+  }
+
+
+ruleMultiply :: Rule
+ruleMultiply = Rule
+  { name = "compose by multiplication"
+  , pattern =
+    [ dimension Numeral
+    , Predicate isMultipliable
+    ]
+  , prod = \tokens -> case tokens of
+      (token1:token2:_) -> multiply token1 token2
+      _ -> Nothing
+  }
+
 rules :: [Rule]
 rules =
   [ ruleDecimalNumeral
@@ -329,4 +410,10 @@ rules =
   , ruleNumeralDotNumeral
   , ruleNumeralsPrefixWithMinus
   , ruleNumeralsSuffixesKMG
+  , ruleHundreds
+  , ruleThousands
+  , ruleMillionsBillions
+  , ruleSum
+  , ruleSumAnd
+  , ruleMultiply
   ]
