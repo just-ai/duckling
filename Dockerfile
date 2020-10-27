@@ -23,12 +23,12 @@ ADD . .
 # '-j1' flag to force the build to run sequentially.
 RUN stack install
 
-FROM debian:stretch
+FROM ubuntu:18.04
 
 ENV LANG C.UTF-8
 
 RUN apt-get update -qq && \
-  apt-get install -qq -y libpcre3 libgmp10 --no-install-recommends && \
+  apt-get install -qq -y libpcre3 libgmp10 tzdata --no-install-recommends && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
