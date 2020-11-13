@@ -1549,22 +1549,6 @@ ruleIntervalSlash = Rule
       _ -> Nothing
   }
 
-ruleIntervalFromLatent :: Rule
-ruleIntervalFromLatent = Rule
-  { name = "<datetime> по <datetime> (interval) (latent)"
-  , pattern =
-    [ dimension Time
-    , regex "(и\\s)?(по|до)"
-    , dimension Time
-    ]
-  , prod = \tokens -> case tokens of
-      (Token Time td1:_:Token Time td2:_) ->
-        if sameGrain td1 td2 then
-          Token Time . mkLatent <$> interval TTime.Closed td1 td2
-        else Nothing
-      _ -> Nothing
-  }
-
 ruleIntervalFrom :: Rule
 ruleIntervalFrom = Rule
   { name = "c <datetime> по <datetime> (interval)"
@@ -1673,8 +1657,21 @@ ruleIntervalBy :: Rule
 ruleIntervalBy = Rule
   { name = "by <time>"
   , pattern =
-    [ regex "by"
+    [ regex "к"
     , dimension Time
+    ]
+  , prod = \tokens -> case tokens of
+      (_:Token Time td:_) -> Token Time <$> interval TTime.Open now td
+      _ -> Nothing
+  }
+
+ruleIntervalByHours :: Rule
+ruleIntervalByHours = Rule
+  { name = "by <time>"
+  , pattern =
+    [ regex "к"
+    , dimension Time
+    , regex "часам"
     ]
   , prod = \tokens -> case tokens of
       (_:Token Time td:_) -> Token Time <$> interval TTime.Open now td
@@ -2496,7 +2493,6 @@ rules =
   , ruleIntervalDDDDMonth
   , ruleIntervalDash
   , ruleIntervalSlash
-  , ruleIntervalFromLatent
   , ruleIntervalFrom
   , ruleIntervalBetween
   , ruleIntervalTODDash
@@ -2504,6 +2500,7 @@ rules =
   , ruleIntervalTODAMPM
   , ruleIntervalTODBetween
   , ruleIntervalBy
+  , ruleIntervalByHours
   , ruleIntervalByTheEndOf
   , ruleIntervalUntilTime
   , ruleIntervalAfterFromSinceTime
