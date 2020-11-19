@@ -1966,7 +1966,7 @@ ruleCycleTheAfterBeforeTime = Rule
 -- e.g. "минут через 10", "лет через 5"
 ruleCycleAfterCount :: Rule
 ruleCycleAfterCount = Rule
-  { name = "<cycle> через <time>"
+  { name = "<cycle> через <count>"
   , pattern =
     [ dimension TimeGrain
     , regex "через"
@@ -1977,7 +1977,7 @@ ruleCycleAfterCount = Rule
        _:
        Token Numeral NumeralData{TNumeral.value = v}:
        _) -> 
-        tt $ cycleN False grain $ floor v
+        tt $ cycleNth grain $ floor v
       _ -> Nothing
   }
 
@@ -2153,11 +2153,7 @@ ruleDurationInWithinAfter = Rule
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):
        Token Duration dd@DurationData{TDuration.grain, TDuration.value}:
-       _) -> case Text.toLower match of
-               "в течение" -> Token Time <$> interval TTime.Open now (inDuration dd)
-               "после"     -> tt . withDirection TTime.After $ inDuration dd
-               "через"     -> Token Time <$> interval TTime.Open now (inDuration dd)
-               _           -> Nothing
+       _) -> tt $ inDuration dd
       _ -> Nothing
   }
 
@@ -2205,7 +2201,7 @@ ruleDurationHenceAgo = Rule
        Token RegexMatch (GroupMatch (match:_)):
        _) -> case Text.toLower match of
         "назад" -> tt $ durationAgo dd
-        _       -> Token Time <$> interval TTime.Open now (inDuration dd)
+        _       -> tt $ inDuration dd
       _ -> Nothing
   }
 
@@ -2217,7 +2213,7 @@ ruleDurationHence = Rule
     , dimension Duration
     ]
   , prod = \tokens -> case tokens of
-      (_:Token Duration dd:_) -> Token Time <$> interval TTime.Open now (inDuration dd)
+      (_:Token Duration dd:_) -> tt $ inDuration dd
       _ -> Nothing
   }
 

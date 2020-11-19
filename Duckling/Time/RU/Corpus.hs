@@ -307,31 +307,31 @@ allExamples = concat
              [ "завтра в 7:20"
              , "завтра утром в 7 20"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 12, 4, 31, 0)) Second)
+  , examples (datetime (2013, 2, 12, 4, 31, 0) Second)
              [ "через минуту"
              , "через 1 минуту"
              , "через минутку"
              , "через минуточку"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 12, 5, 30, 0)) Second)
+  , examples (datetime (2013, 2, 12, 5, 30, 0) Minute)
              [ "через час"
              , "через часок"
              , "через часик"
              , "через часочек"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 19, 0, 0, 0)) Second)
+  , examples (datetime (2013, 2, 19, 0, 0, 0) Day)
              [ "в течение недели"
              , "в течение 1 недели"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 19, 0, 0, 0)) Second)
+  , examples (datetime (2013, 2, 19, 0, 0, 0) Day)
              [ "через неделю"
              , "через 1 неделю"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 26, 0, 0, 0)) Second)
+  , examples (datetime (2013, 2, 26, 0, 0, 0) Day)
              [ "через 2 недели"
              , "через две недели"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 26, 0, 0, 0)) Second)
+  , examples (datetime (2013, 2, 26, 0, 0, 0) Day)
              [ "в течение 2 недель"
              , "в течение двух недель"
              ]
@@ -346,24 +346,24 @@ allExamples = concat
              , "15 минут двенадцатого"
              , "15 мин. двенадцатого"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 12, 4, 40, 0)) Second)
+  , examples (datetime (2013, 2, 12, 4, 40, 0) Second)
              [ "через 10 минут"
              , "через десять минут"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 12, 4, 40, 0)) Minute)
+  , examples (datetime (2013, 2, 12, 4, 40, 0) Minute)
              [ "минут через десять"
              , "минут через 10"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 12, 4, 45, 0)) Second)
+  , examples (datetime (2013, 2, 12, 4, 45, 0) Second)
              [ "через 15 минут"
              , "через четверть часа"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 12, 6, 00, 0)) Second)
+  , examples (datetime (2013, 2, 12, 6, 00, 0) Second)
              [ "через полтора часа"
              , "спустя полтора часа"
              , "полтора часа спустя"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 3, 12, 0, 0, 0)) Second)
+  , examples (datetime (2013, 3, 12, 0, 0, 0) Day)
              [ "через месяц"
              , "спустя месяц"
              , "месяц спустя"
@@ -385,7 +385,7 @@ allExamples = concat
              , "в предстоящем году"
              , "в будущем году"
              ]
-  , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 17, 4, 30, 0)) Second)
+  , examples (datetime (2013, 2, 17, 4, 30, 0) Minute)
              [ "через 5 суток"
              , "спустя 5 суток"
              , "5 суток спустя"
