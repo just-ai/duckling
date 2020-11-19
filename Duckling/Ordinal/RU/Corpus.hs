@@ -160,5 +160,81 @@ allExamples = concat
              [ "100ый"
              , "100-й"
              , "сотый"
+             , "сотого"
+             , "сотом"
+             ]
+  , examples (OrdinalData 200)
+             [ "двухсотый"
+             ]
+  , examples (OrdinalData 300)
+             [ "трёхсотый"
+             ]
+  , examples (OrdinalData 400)
+             [ "четырехсотый"
+             ]
+  , examples (OrdinalData 500)
+             [ "пятисотый"
+             ]
+  , examples (OrdinalData 600)
+             [ "шестисотый"
+             ]
+  , examples (OrdinalData 700)
+             [ "семисотый"
+             ]
+  , examples (OrdinalData 800)
+             [ "восьмисотый"
+             ]
+  , examples (OrdinalData 900)
+             [ "девятисотый"
+             ]
+  , examples (OrdinalData 525)
+             [ "пятьсот двадцать пятый"
+             , "пятьсот двадцать пятого"
+             ]
+  , examples (OrdinalData 1000)
+             [ "1000ый"
+             , "1000-й"
+             , "тысячный"
+             , "тысячного"
+             , "тысячном"
+             ]
+  , examples (OrdinalData 2000)
+             [ "двутысячный"
+             ]
+  , examples (OrdinalData 3000)
+             [ "трёхтысячный"
+             ]
+  , examples (OrdinalData 4000)
+             [ "четырехтысячный"
+             ]
+  , examples (OrdinalData 5000)
+             [ "пятитысячный"
+             ]
+  , examples (OrdinalData 6000)
+             [ "шеститысячный"
+             ]
+  , examples (OrdinalData 7000)
+             [ "семитысячный"
+             ]
+  , examples (OrdinalData 8000)
+             [ "восьмитысячный"
+             ]
+  , examples (OrdinalData 9000)
+             [ "девятитысячный"
+             ]
+  , examples (OrdinalData 1021)
+             [ "тысяча двадцать первый"
+             ]
+  , examples (OrdinalData 1500)
+             [ "тысяча пятисотый"
+             ]
+  , examples (OrdinalData 3000207)
+             [ "три миллиона двести седьмой"
+             ]
+  , examples (OrdinalData 3000900)
+             [ "три миллиона девятисотый"
+             ]
+  , examples (OrdinalData 3060160)
+             [ "три миллиона шестьдесят тысяч сто шестидесятый"
              ]
   ]

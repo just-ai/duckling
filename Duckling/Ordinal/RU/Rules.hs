@@ -147,6 +147,59 @@ rule100 = Rule
       _ -> Nothing
   }
 
+ordPrefixMap :: HashMap Text.Text Int
+ordPrefixMap = HashMap.fromList
+  [ ( "дву", 2)
+  , ( "двух", 2)
+  , ( "трех", 3)
+  , ( "трёх", 3)
+  , ( "четырёх", 4)
+  , ( "четырех", 4)
+  , ( "пяти", 5)
+  , ( "шести", 6)
+  , ( "семи", 7)
+  , ( "восьми", 8)
+  , ( "девяти", 9)
+  ]
+
+rule100Composed :: Rule
+rule100Composed = Rule
+  { name = "ordinal [2..9]x100"
+  , pattern =
+    [ regex "(дву|двух|трех|трёх|четырех|четырёх|пяти|шести|семи|восьми|девяти)сот(ый|ого|ому|ом)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) -> do
+        cnt <- HashMap.lookup (Text.toLower match) ordPrefixMap
+        Just . ordinal $ cnt * 100
+      _ -> Nothing
+  }
+
+rule1000 :: Rule
+rule1000 = Rule
+  { name = "ordinal 1000"
+  , pattern =
+    [ regex "тысячн(ый|ого|ому|ом)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (m:_)):_) -> Just (ordinal 1000)
+      _ -> Nothing
+  }
+
+rule1000Composed :: Rule
+rule1000Composed = Rule
+  { name = "ordinal [2..9]x100"
+  , pattern =
+    [ regex "(дву|двух|трех|трёх|четырех|четырёх|пяти|шести|семи|восьми|девяти)тысячн(ый|ого|ому|ом)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) -> do
+        cnt <- HashMap.lookup (Text.toLower match) ordPrefixMap
+        Just . ordinal $ cnt * 1000
+      _ -> Nothing
+  }
+  
+
 ruleComposite :: Rule
 ruleComposite = Rule
   { name = "ordinal composition"
@@ -175,5 +228,8 @@ rules =
   , ruleOrdinalDigits
   , ruleOrdinalsFirstth
   , rule100
+  , rule100Composed
+  , rule1000
+  , rule1000Composed
   , ruleComposite
   ]
