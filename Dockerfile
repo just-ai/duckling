@@ -23,7 +23,7 @@ ADD . .
 # '-j1' flag to force the build to run sequentially.
 RUN stack install
 
-FROM debian:stretch
+FROM ubuntu:18.04
 
 ENV LANG C.UTF-8
 
