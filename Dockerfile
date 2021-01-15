@@ -36,4 +36,4 @@ COPY --from=builder /root/.local/bin/duckling-example-exe /usr/local/bin/
 
 EXPOSE 9350
 
-ENTRYPOINT ["duckling-example-exe", "--", "-p", "9350"]
+ENTRYPOINT ["duckling-example-exe", "-p", "9350"]
