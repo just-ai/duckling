@@ -84,6 +84,19 @@ ruleDecimalNumeral = Rule
       _ -> Nothing
   }
 
+ruleDecimalNumeralComma :: Rule
+ruleDecimalNumeralComma = Rule
+  { name = "decimal number (comma)"
+  , pattern =
+    [ regex "(\\d*,\\d+)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) -> parseDecimal True match2
+        where match2 = (Text.replace "," "." match)
+      _ -> Nothing
+  }
+  
+
 ruleInteger3 :: Rule
 ruleInteger3 = Rule
   { name = "integer 2"
@@ -300,13 +313,13 @@ ruleNumeralDotNumeral = Rule
 
 ruleIntegerWithThousandsSeparator :: Rule
 ruleIntegerWithThousandsSeparator = Rule
-  { name = "integer with thousands separator ,"
+  { name = "integer with thousands separator '"
   , pattern =
-    [ regex "(\\d{1,3}(,\\d\\d\\d){1,5})"
+    [ regex "(\\d{1,3}('\\d\\d\\d){1,5})"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) ->
-        parseDouble (Text.replace "," Text.empty match) >>= double
+        parseDouble (Text.replace "'" Text.empty match) >>= double
       _ -> Nothing
   }
 
@@ -394,6 +407,7 @@ ruleMultiply = Rule
 rules :: [Rule]
 rules =
   [ ruleDecimalNumeral
+  , ruleDecimalNumeralComma
   , ruleDecimalWithThousandsSeparator
   , ruleInteger
   , ruleInteger2

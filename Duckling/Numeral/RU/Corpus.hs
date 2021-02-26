@@ -97,15 +97,18 @@ allExamples = concat
              ]
   , examples (NumeralValue 1.5)
              [ "1.5"
+             , "1,5"
              , "полторы"
              , "один с половиной"
              ]
   , examples (NumeralValue 3.5)
              [ "3.5"
+             , "3,5"
              , "три с половиной"
              ]
   , examples (NumeralValue 1.1)
              [ "1.1"
+             , "1,1"
              , "1.10"
              , "01.10"
              , "1 точка 1"
@@ -113,6 +116,7 @@ allExamples = concat
              ]
   , examples (NumeralValue 0.77)
              [ "0.77"
+             , "0,77"
              , ".77"
              ]
   , examples (NumeralValue 100000)

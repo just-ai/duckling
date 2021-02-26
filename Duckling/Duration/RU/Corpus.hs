@@ -62,6 +62,7 @@ allExamples = concat
   , examples (DurationData 5400 Second)
              [ "полтора часа"
              , "1.5 часа"
+             , "1,5 часа"
              , "5400 секунд"
              ]
   , examples (DurationData 8 Hour)

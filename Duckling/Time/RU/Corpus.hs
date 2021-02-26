@@ -36,6 +36,7 @@ negativeCorpus = (testContext {locale = makeLocale RU Nothing}, testOptions, exa
       , "он тут один"
       , "единственный день"
       , "900 рублей потратил"
+      , "по 32"
       ]
 
 allExamples :: [Example]
@@ -191,7 +192,8 @@ allExamples = concat
              , "в 6 часов ноль минут"
              ]
   , examples (datetime (2013, 2, 13, 0, 30, 0) Minute)
-             [ "в 00:30 ночи"
+             [ "в 00:30"
+             , "в 00:30 ночи"
              , "пол первого ночи"
              , "полпервого ночи"
              ]
@@ -425,14 +427,36 @@ allExamples = concat
              [ "с 5 по 7 марта"
              , "с пятого по седьмое марта"
              , "с пятого по седьмое"
+             , "с пятого по 7"
              ]
   , examples (datetimeInterval ((2013, 3, 1, 0, 0, 0), (2013, 3, 6, 0, 0, 0)) Day)
              [ "с 1 по 5 марта"
+             , "с 01.03 по 05.03"
+             ]
+  , examples (datetimeOpenInterval Before (2013, 3, 5, 0, 0, 0) Day)
+             [ "до 5 марта"
+             , "по 5 марта"
+             , "по пятое"
+             , "по 5"
+             , "по 5.03"
+             ]
+  , examples (datetimeOpenInterval Before (2013, 2, 15, 0, 0, 0) Day)
+             [ "по пятнадцатое"
+             , "по 15"
+             , "по 15.02"
              ]
   , examples (datetimeInterval ((2013, 2, 12, 4, 30, 0), (2013, 2, 12, 14, 0, 0)) Second)
              [ "к 14:00"
              , "к 14"
              , "к 14 часам"
+             ]
+  , examples (datetimeInterval ((2013, 2, 12, 12, 0, 0), (2013, 2, 12, 16, 0, 0)) Hour)
+             [ "с 12 до 15"
+             , "с двенадцати до пятнадцати"
+             ]
+  , examples (datetimeInterval ((2013, 2, 12, 13, 0, 0), (2013, 2, 12, 16, 0, 0)) Hour)
+             [ "с 13 до 15"
+             , "с тринадцати до пятнадцати"
              ]
   , examples (datetimeHoliday (2014, 1, 1, 0, 0, 0) Day "Новый год")
              [ "Новый Год"
