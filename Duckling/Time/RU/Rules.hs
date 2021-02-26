@@ -654,7 +654,7 @@ ruleHHMM = Rule
       (Token RegexMatch (GroupMatch (hh:mm:_)):_) -> do
         h <- parseInt hh
         m <- parseInt mm
-        tt $ hourMinute True h m
+        tt $ hourMinute (0 < h && h < 13) h m
       _ -> Nothing
   }
 
