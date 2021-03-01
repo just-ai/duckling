@@ -401,6 +401,34 @@ ruleYearLatent2 = Rule
       _ -> Nothing
   }
 
+ruleYearOrdinalLatent :: Rule
+ruleYearOrdinalLatent = Rule
+  { name = "<year> (ordinal, latent)"
+  , pattern =
+      [ Predicate $
+        or . sequence [isOrdinalBetween (- 10000) 0, isOrdinalBetween 25 10000]
+      ]
+  , prod = \tokens -> case tokens of
+      (token:_) -> do
+        n <- getIntValue token
+        tt . mkLatent $ year n
+      _ -> Nothing
+  }
+
+ruleYearOrdinalLatent2 :: Rule
+ruleYearOrdinalLatent2 = Rule
+  { name = "<year> (ordinal, latent)"
+  , pattern =
+      [ Predicate $
+        or . sequence [isOrdinalBetween (- 10000) 0, isOrdinalBetween 25 10000]
+      , regex "год.?"
+      ]
+  , prod = \tokens -> case tokens of
+      (token:_) -> do
+        n <- getIntValue token
+        tt . mkLatent $ year n
+      _ -> Nothing
+  }
 
 ruleYearADBC :: Rule -- todo fix
 ruleYearADBC = Rule
@@ -2427,6 +2455,8 @@ rules =
   , ruleNthTimeAfterTime
   , ruleTheNthTimeAfterTime
   , ruleYearLatent
+  , ruleYearOrdinalLatent
+  , ruleYearOrdinalLatent2
   , ruleYearLatent2
   , ruleYearADBC
   , ruleTheDOMNumeral
