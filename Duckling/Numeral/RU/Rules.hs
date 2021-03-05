@@ -292,7 +292,7 @@ ruleInteger2 :: Rule
 ruleInteger2 = Rule
   { name = "integer 1"
   , pattern =
-    [ regex "(один|одна|одну)"
+    [ regex "(один|одна|одну|одного)"
     ]
   , prod = \_ -> integer 1
   }
