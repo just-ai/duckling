@@ -62,7 +62,7 @@ allExamples = concat
   , examples (simple Dollar 1e4)
              [ "$10К"
              , "10к$"
-             , "$10,000"
+             , "$10'000"
              ]
   , examples (simple USD 3.14)
              [ "USD3.14"

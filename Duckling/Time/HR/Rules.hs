@@ -1299,7 +1299,7 @@ ruleHhmm :: Rule
 ruleHhmm = Rule
   { name = "hh:mm"
   , pattern =
-    [ regex "((?:[01]?\\d)|(?:2[0-3]))[(:.\\si]+([0-5]\\d)"
+    [ regex "((?:[01]?\\d)|(?:2[0-3]))[(:\\si]+([0-5]\\d)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (hh:mm:_)):_) -> do
