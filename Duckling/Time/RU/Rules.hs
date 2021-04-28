@@ -1080,7 +1080,7 @@ ruleDDMM :: Rule
 ruleDDMM = Rule
   { name = "dd.mm"
   , pattern =
-    [ regex "(3[01]|[12]\\d|0?[1-9])\\.(0?[1-9]|1[0-2])"
+    [ regex "(3[01]|[12]\\d|0?[1-9])\\.(0[1-9]|1[0-2]?|[2-9])"
     ]
   , prod = \case
       (Token RegexMatch (GroupMatch (dd:mm:_)):_) -> do
@@ -1772,7 +1772,7 @@ ruleMonths = mkRuleMonths
   , ( "May"      , "ма[йея]"                  )
   , ( "June"     , "июн[ьяюе]"                )
   , ( "July"     , "июл[ьяюе]"                )
-  , ( "August"   , "август[ауе]|авг\\.?"      )
+  , ( "August"   , "август[ауе]?|авг\\.?"      )
   , ( "September", "сентябр[ьяюе]|сент?\\.?"  )
   , ( "October"  , "октябр[ьяюе]|окт\\.?"     )
   , ( "November" , "ноябр[ьяюе]|нояб\\.?"     )
