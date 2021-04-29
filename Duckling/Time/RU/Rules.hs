@@ -1090,11 +1090,40 @@ ruleDDMM = Rule
       _ -> Nothing
   }
 
+ruleDDMM2 :: Rule
+ruleDDMM2 = Rule
+  { name = "dd mm"
+  , pattern =
+    [ regex "(3[01]|[12]\\d|0?[1-9]) (0[1-9]|1[0-2]?|[2-9])"
+    ]
+  , prod = \case
+      (Token RegexMatch (GroupMatch (dd:mm:_)):_) -> do
+        d <- parseInt dd
+        m <- parseInt mm
+        tt $ monthDay m d
+      _ -> Nothing
+  }
+
 ruleDDMMYY :: Rule
 ruleDDMMYY = Rule
   { name = "dd.mm.yy"
   , pattern =
     [ regex "(3[01]|[12]\\d|0?[1-9])\\.(0?[1-9]|1[0-2])\\.(\\d{2,4})"
+    ]
+  , prod = \case
+      (Token RegexMatch (GroupMatch (dd:mm:yy:_)):_) -> do
+        d <- parseInt dd
+        m <- parseInt mm
+        y <- parseInt yy
+        tt $ yearMonthDay y m d
+      _ -> Nothing
+  }
+
+ruleDDMMYY2 :: Rule
+ruleDDMMYY2 = Rule
+  { name = "dd mm yy"
+  , pattern =
+    [ regex "(3[01]|[12]\\d|0?[1-9]) (0?[1-9]|1[0-2]) (\\d{2,4})"
     ]
   , prod = \case
       (Token RegexMatch (GroupMatch (dd:mm:yy:_)):_) -> do
@@ -2504,7 +2533,9 @@ rules =
   , ruleYYYYMM
   , ruleYYYYMMDD
   , ruleDDMM
+  , ruleDDMM2
   , ruleDDMMYY
+  , ruleDDMMYY2
   , ruleMMYYYY
   , ruleNoon
   , ruleAfterNoon
