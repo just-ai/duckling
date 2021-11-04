@@ -101,7 +101,7 @@ ruleInteger3 :: Rule
 ruleInteger3 = Rule
   { name = "integer 2"
   , pattern =
-    [ regex "(два|две|двух|двое|пара|пару|парочку|парочка)"
+    [ regex "(два|две|двух|пара|пару|парочку|парочка)"
     ]
   , prod = \_ -> integer 2
   }
@@ -339,7 +339,7 @@ ruleThousands :: Rule
 ruleThousands = Rule
   { name = "integer 1000"
   , pattern =
-    [ regex "тысяч(а(ми|м|х|)|(е(й|ю|))|и|у|ью|)"
+    [ regex "тыс((яч(а(ми|м|х|)|(е(й|ю|))|и|у|ью|))|)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) -> case Text.toLower match of
@@ -351,10 +351,11 @@ ruleMillionsBillions :: Rule
 ruleMillionsBillions = Rule
   { name = "integer million/billion"
   , pattern =
-    [ regex "(миллион|миллиард)(а(ми|м|х|)|е|о(в|м)|у|ы|)"
+    [ regex "(млн|миллион|миллиард)(а(ми|м|х|)|е|о(в|м)|у|ы|)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) -> case Text.toLower match of
+        "млн"  -> double 1e6 >>= withGrain 6 >>= withMultipliable
         "миллион"  -> double 1e6 >>= withGrain 6 >>= withMultipliable
         "миллиард"  -> double 1e9 >>= withGrain 9 >>= withMultipliable
         _  -> Nothing
@@ -404,6 +405,31 @@ ruleMultiply = Rule
       _ -> Nothing
   }
 
+collectiveNumeralMap :: HashMap Text Integer
+collectiveNumeralMap = HashMap.fromList
+  [ ( "двое", 2)
+  , ( "трое", 3)
+  , ( "четверо", 4)
+  , ( "пятеро", 5)
+  , ( "шестеро", 6)
+  , ( "семеро", 7)
+  , ( "восьмеро", 8)
+  , ( "осьмеро", 8)
+  , ( "девятеро", 9)
+  ]
+
+ruleCollectiveNumeral :: Rule
+ruleCollectiveNumeral = Rule
+  { name = "integer 2..9"
+  , pattern =
+    [ regex "(двое|трое|четверо|пятеро|шестеро|семеро|восьмеро|осьмеро|девятеро)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (match:_)):_) ->
+        HashMap.lookup (Text.toLower match) collectiveNumeralMap >>= integer
+      _ -> Nothing
+  }
+
 rules :: [Rule]
 rules =
   [ ruleDecimalNumeral
@@ -430,4 +456,5 @@ rules =
   , ruleSum
   , ruleSumAnd
   , ruleMultiply
+  , ruleCollectiveNumeral
   ]

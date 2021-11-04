@@ -17,7 +17,7 @@ module Duckling.Time.RU.Rules
   ) where
 
 import Data.Maybe
-import Data.Text (Text)
+import Data.Text (Text, head)
 import Prelude
 import qualified Data.Text as Text
 
@@ -375,14 +375,25 @@ ruleTheNthTimeAfterTime = Rule
 ruleYearLatent :: Rule
 ruleYearLatent = Rule
   { name = "<year> (latent)"
-  , pattern =
-      [ Predicate $
-        or . sequence [isIntegerBetween (- 10000) 0, isIntegerBetween 25 10000]
-      ]
+  , pattern = [ Predicate $ isIntegerBetween 25 10000 ]
   , prod = \tokens -> case tokens of
       (token:_) -> do
         n <- getIntValue token
         tt . mkLatent $ year n
+      _ -> Nothing
+  }
+
+ruleYearLatent0 :: Rule
+ruleYearLatent0 = Rule
+  { name = "<00-year> (latent)"
+  , pattern =
+    [ regex "(00[0-9]*)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token RegexMatch (GroupMatch (t:_)):_) -> do
+        n <- parseInt t
+        td <- year2 n
+        tt . mkLatent $ td
       _ -> Nothing
   }
 
@@ -535,7 +546,7 @@ ruleDOMMonth = Rule
 
 ruleDOMMonthYear :: Rule
 ruleDOMMonthYear = Rule
-  { name = "<day-of-month>(ordinal or number)/<named-month>/<year>"
+  { name = "<day-of-month>(ordinal or number)/<named-month>/<year> (1)"
   , pattern =
     [ Predicate isDOMValue
     , regex "[-/\\s]"
@@ -548,17 +559,18 @@ ruleDOMMonthYear = Rule
        _:
        Token Time td:
        _:
-       Token RegexMatch (GroupMatch (match:_)):
+       Token RegexMatch (GroupMatch (ymatch:_)):
        _) -> do
-         intVal <- parseInt match
+         intVal <- parseInt ymatch
          dom <- intersectDOM td token
-         Token Time <$> intersect dom (year intVal)
+         td <- year2 intVal
+         Token Time <$> intersect dom td
       _ -> Nothing
   }
 
 ruleDOMMonthYear2 :: Rule
 ruleDOMMonthYear2 = Rule
-  { name = "<day-of-month>(ordinal or number)/<named-month>/<year>"
+  { name = "<day-of-month>(ordinal or number)/<named-month>/<year> (2)"
   , pattern =
     [ Predicate isDOMValue
     , regex "[-/\\s]"
@@ -600,10 +612,18 @@ ruleDOMOrdinalMonthYear = Rule
     , regex "(\\d{2,4})"
     ]
   , prod = \tokens -> case tokens of
-      (token:Token Time td:Token RegexMatch (GroupMatch (match:_)):_) -> do
-        intVal <- parseInt match
+      (token:Token Time td:Token RegexMatch (GroupMatch (yy:_)):_) -> do
         dom <- intersectDOM td token
-        Token Time <$> intersect dom (year intVal)
+
+        y <- parseInt yy
+        case Text.length yy of
+          2 -> Token Time <$> intersect dom (year y)
+          4 -> do
+            yt <- year2 y
+            Token Time <$> intersect dom yt
+          _ -> Nothing
+        
+        
       _ -> Nothing
   }
 
@@ -1080,7 +1100,7 @@ ruleDDMM :: Rule
 ruleDDMM = Rule
   { name = "dd.mm"
   , pattern =
-    [ regex "(3[01]|[12]\\d|0?[1-9])\\.(0[1-9]|1[0-2]?|[2-9])"
+    [ regex "(3[01]|[12]\\d|0?[1-9])[./](0[1-9]|1[0-2]?|[2-9])"
     ]
   , prod = \case
       (Token RegexMatch (GroupMatch (dd:mm:_)):_) -> do
@@ -1115,7 +1135,12 @@ ruleDDMMYY = Rule
         d <- parseInt dd
         m <- parseInt mm
         y <- parseInt yy
-        tt $ yearMonthDay y m d
+        case Text.length yy of
+          2 -> tt $ yearMonthDay y m d
+          4 -> do
+            td <- yearMonthDay2 y m d
+            tt $ td
+          _ -> Nothing
       _ -> Nothing
   }
 
@@ -1130,7 +1155,12 @@ ruleDDMMYY2 = Rule
         d <- parseInt dd
         m <- parseInt mm
         y <- parseInt yy
-        tt $ yearMonthDay y m d
+        case Text.length yy of
+          2 -> tt $ yearMonthDay y m d
+          4 -> do
+            td <- yearMonthDay2 y m d
+            tt $ td
+          _ -> Nothing
       _ -> Nothing
   }
 
@@ -1144,9 +1174,35 @@ ruleMMYYYY = Rule
       (Token RegexMatch (GroupMatch (mm:yy:_)):_) -> do
         y <- parseInt yy
         m <- parseInt mm
-        tt $ yearMonth y m
+        td <- yearMonth2 y m
+        tt $ td
       _ -> Nothing
   }
+
+ruleDDMMYY3 = Rule
+  { name = "dd/mm/{yy, yyyy}?"
+  , pattern =
+    [ regex "(3[01]|[12]\\d|0?[1-9])/(0?[1-9]|1[0-2])/(\\d{2,4})"
+    ]
+  , prod = \case
+      (Token RegexMatch (GroupMatch (dd:mm:yy:_)):_) -> do
+        d <- parseInt dd
+        m <- parseInt mm
+        -- tt $ monthDay m d
+        y <- parseInt yy
+        case Text.length yy of
+          2 -> tt $ yearMonthDay y m d
+          4 -> do
+            td <- yearMonthDay2 y m d
+            tt $ td
+          _ -> Nothing
+      (Token RegexMatch (GroupMatch (dd:mm:_)):_) -> do
+        d <- parseInt dd
+        m <- parseInt mm
+        tt $ monthDay m d
+      _ -> Nothing
+  }
+
 
 ruleYYYYMM :: Rule
 ruleYYYYMM = Rule
@@ -1158,7 +1214,8 @@ ruleYYYYMM = Rule
       (Token RegexMatch (GroupMatch (yy:mm:_)):_) -> do
         y <- parseInt yy
         m <- parseInt mm
-        tt $ yearMonth y m
+        td <- yearMonth2 y m
+        tt $ td
       _ -> Nothing
   }
 
@@ -1173,7 +1230,12 @@ ruleYYYYMMDD = Rule
         y <- parseInt yy
         m <- parseInt mm
         d <- parseInt dd
-        tt $ yearMonthDay y m d
+        case Text.length yy of
+          2 -> tt $ yearMonthDay y m d
+          4 -> do
+            td <- yearMonthDay2 y m d
+            tt $ td
+          _ -> Nothing
       _ -> Nothing
   }
 
@@ -1649,9 +1711,7 @@ ruleIntervalFromTo = Rule
     ]
   , prod = \tokens -> case tokens of
       (_:Token Time td1:_:Token Time td2:_) ->
-        if sameGrain td1 td2 then
           Token Time <$> interval TTime.Closed td1 td2
-        else Nothing
       _ -> Nothing
   }
 
@@ -2537,6 +2597,7 @@ rules =
   , ruleDDMMYY
   , ruleDDMMYY2
   , ruleMMYYYY
+  , ruleDDMMYY3
   , ruleNoon
   , ruleAfterNoon
   , ruleAfterMidnight

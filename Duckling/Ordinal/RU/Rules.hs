@@ -87,7 +87,7 @@ ruleOrdinalsFirstth :: Rule
 ruleOrdinalsFirstth = Rule
   { name = "ordinals (first..19th)"
   , pattern =
-    [ regex "(перв|втор|трет|четверт|пят|шест|седьм|восьм|девят|десят|одинадцат|одиннадцат|двенадцат|тринадцат|четырнадцат|пятнадцат|шестнадцат|семнадцат|восемнадцат|девятнадцат|двадцат)(ье(го|й)?|ого|ый|ой|ий|ая|ое|ья)"
+    [ regex "(перв|втор|трет|четверт|пят|шест|седьм|восьм|девят|десят|одинадцат|одиннадцат|двенадцат|тринадцат|четырнадцат|пятнадцат|шестнадцат|семнадцат|восемнадцат|девятнадцат|двадцат)(ь(и(ми|х|)|е(го|й|))|ого|ы(ми?|й|е|х)|ой|ий|ая|ое|ья)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) ->
@@ -113,7 +113,7 @@ ruleOrdinal = Rule
   { name = "ordinals (composite, e.g. восемьдесят-пятый, сорок-седьмой, двадвать-девятый, тридцать-третий"
   , pattern =
     [ regex "(двадцать|тридцать|сорок|пятьдесят|шестьдесят|семьдесят|восемьдесят|девяносто)"
-    , regex "(перв|втор|трет|четверт|пят|шест|седьм|восьм|девят)(ье(го|й)?|ого|ый|ой|ий|ая|ое|ья)"
+    , regex "(перв|втор|трет|четверт|пят|шест|седьм|восьм|девят)(ь(и(ми|х|)|е(го|й|))|ого|ы(ми?|й|е|х)|ой|ий|ая|ое|ья)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (m1:_)):
@@ -140,7 +140,7 @@ rule100 :: Rule
 rule100 = Rule
   { name = "ordinal 100"
   , pattern =
-    [ regex "сот(ый|ого|ому|ом)"
+    [ regex "сот(ы(й|х)|ого|ому|ом)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (m:_)):_) -> Just (ordinal 100)
@@ -166,7 +166,7 @@ rule100Composed :: Rule
 rule100Composed = Rule
   { name = "ordinal [2..9]x100"
   , pattern =
-    [ regex "(дву|двух|трех|трёх|четырех|четырёх|пяти|шести|семи|восьми|девяти)сот(ый|ого|ому|ом)"
+    [ regex "(дву|двух|трех|трёх|четырех|четырёх|пяти|шести|семи|восьми|девяти)сот(ы(й|х)|ого|ому|ом)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) -> do
@@ -179,7 +179,7 @@ rule1000 :: Rule
 rule1000 = Rule
   { name = "ordinal 1000"
   , pattern =
-    [ regex "тысячн(ый|ого|ому|ом)"
+    [ regex "тысячн(ы(й|х)|ого|ому|ом)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (m:_)):_) -> Just (ordinal 1000)
@@ -190,7 +190,7 @@ rule1000Composed :: Rule
 rule1000Composed = Rule
   { name = "ordinal [2..9]x100"
   , pattern =
-    [ regex "(дву|двух|трех|трёх|четырех|четырёх|пяти|шести|семи|восьми|девяти)тысячн(ый|ого|ому|ом)"
+    [ regex "(дву|двух|трех|трёх|четырех|четырёх|пяти|шести|семи|восьми|девяти)тысячн(ы(й|х)|ого|ому|ом)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) -> do
