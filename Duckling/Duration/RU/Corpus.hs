@@ -136,4 +136,18 @@ allExamples = concat
   , examples (DurationData 115 Minute)
              [  "1 час 55 минут"
              ]
+  , examples (DurationData 80 Minute)
+             [ "80 минут"
+             , "1 час и 20 минут"
+             , "час и 20 минут"
+             ]
+  , examples (DurationData 15 Month)
+             [ "15 месяцев"
+             , "1 год и 3 месяца"
+             , "год и 3 месяца"
+             ]
+  , examples (DurationData 29 Month)
+             [ "29 месяцев"
+             , "2 года и 5 месяцев"
+             ]
   ]

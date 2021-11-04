@@ -22,7 +22,7 @@ import qualified Data.Text as Text
 import Duckling.AmountOfMoney.Helpers
 import Duckling.AmountOfMoney.Types (Currency(..), AmountOfMoneyData (..))
 import Duckling.Dimensions.Types
-import Duckling.Numeral.Helpers (isNatural, isPositive)
+import Duckling.Numeral.Helpers (isNatural, isPositive, parseInt)
 import Duckling.Numeral.Types (NumeralData (..))
 import Duckling.Regex.Types
 import Duckling.Types
@@ -47,7 +47,7 @@ ruleRuble :: Rule
 ruleRuble = Rule
   { name = "руб"
   , pattern =
-    [ regex "руб(л(ь|ями|ям|ях|я|ю|(е|ё)м|ей|е|и))?"
+    [ regex "р(уб(л(ь|ями|ям|ях|я|ю|(е|ё)м|ей|е|и|)|\\.)?|)"
     ]
   , prod = \_ -> Just . Token AmountOfMoney $ currencyOnly RUB
   }
@@ -75,6 +75,15 @@ ruleCent = Rule
   { name = "cent"
   , pattern =
     [ regex "цент(ами|ам|ах|а|у|ом|е|ы|ов)?|пени|пенс(ами|ам|ах|а|у|ом|е|ы|ов)?|ц"
+    ]
+  , prod = \_ -> Just . Token AmountOfMoney $ currencyOnly Cent
+  }
+
+ruleKopek :: Rule
+ruleKopek = Rule
+  { name = "kopek"
+  , pattern =
+    [ regex "коп(е(ек|йк(а(ми?|х)?|е|и|о(й|ю)|у))|\\.|)"
     ]
   , prod = \_ -> Just . Token AmountOfMoney $ currencyOnly Cent
   }
@@ -113,33 +122,38 @@ ruleIntersectAndXCents = Rule
       _ -> Nothing
   }
 
+ruleIntersectAnd :: Rule
+ruleIntersectAnd = Rule
+  { name = "intersect"
+  , pattern =
+    [ Predicate isWithoutCents
+    , regex "и"
+    , regex "(0[1-9]|[1-9][0-9]?)к(\\.|)"
+    ]
+  , prod = \tokens -> case tokens of
+      (Token AmountOfMoney fd:
+       _:
+       Token RegexMatch (GroupMatch (ks:_)):
+       _) -> do
+        k <- parseInt ks
+        Just . Token AmountOfMoney $ withCents (fromIntegral k) fd
+      _ -> Nothing
+  }
+
+
 ruleIntersect :: Rule
 ruleIntersect = Rule
   { name = "intersect"
   , pattern =
     [ Predicate isWithoutCents
-    , Predicate isNatural
+    , regex "(0[1-9]|[1-9][0-9]?)к\\.?"
     ]
   , prod = \tokens -> case tokens of
       (Token AmountOfMoney fd:
-       Token Numeral NumeralData{TNumeral.value = c}:
-       _) -> Just . Token AmountOfMoney $ withCents c fd
-      _ -> Nothing
-  }
-
-ruleIntersectAndNumeral :: Rule
-ruleIntersectAndNumeral = Rule
-  { name = "intersect (and number)"
-  , pattern =
-    [ Predicate isWithoutCents
-    , regex "и"
-    , Predicate isNatural
-    ]
-  , prod = \tokens -> case tokens of
-      (Token AmountOfMoney fd:
-       _:
-       Token Numeral NumeralData{TNumeral.value = c}:
-       _) -> Just . Token AmountOfMoney $ withCents c fd
+       Token RegexMatch (GroupMatch (ks:_)):
+       _) -> do
+        k <- parseInt ks
+        Just . Token AmountOfMoney $ withCents (fromIntegral k) fd
       _ -> Nothing
   }
 
@@ -302,10 +316,11 @@ rules =
   [ ruleUnitAmount
   , ruleBucks
   , ruleCent
+  , ruleKopek
   , ruleDollar
   , ruleEUR
   , ruleIntersect
-  , ruleIntersectAndNumeral
+  , ruleIntersectAnd
   , ruleIntersectAndXCents
   , ruleIntersectXCents
   , ruleIntervalBetweenNumeral

@@ -24,8 +24,8 @@ module Duckling.Time.Helpers
   , inTimezone, longWEBefore, minute, minutesAfter, minutesBefore, mkLatent
   , month, monthDay, notLatent, now, nthDOWOfMonth, partOfDay, predLastOf
   , predNth, predNthAfter, predNthClosest, season, second, timeOfDayAMPM
-  , weekday, weekend, workweek, withDirection, year, yearMonthDay, tt, durationIntervalAgo
-  , inDurationInterval, intersectWithReplacement, yearADBC, yearMonth
+  , weekday, weekend, workweek, withDirection, year, year2, yearMonthDay, yearMonthDay2, tt, durationIntervalAgo
+  , inDurationInterval, intersectWithReplacement, yearADBC, yearMonth, yearMonth2
     -- Other
   , getIntValue, timeComputed
   -- Rule constructors
@@ -440,6 +440,11 @@ year n = TTime.timedata'{TTime.timePred = timeYear y, TTime.timeGrain = TG.Year}
   where
     y = if n <= 99 then mod (n + 50) 100 + 2000 - 50 else n
 
+year2 :: Int -> Maybe TimeData
+year2 y = if y > 0
+  then Just TTime.timedata'{TTime.timePred = timeYear y, TTime.timeGrain = TG.Year}
+  else Nothing
+
 yearADBC :: Int -> TimeData
 yearADBC n =
   TTime.timedata'{TTime.timePred = timeYear n, TTime.timeGrain = TG.Year}
@@ -447,8 +452,19 @@ yearADBC n =
 yearMonth :: Int -> Int -> TimeData
 yearMonth y m = intersect' (year y, month m)
 
+yearMonth2 :: Int -> Int -> Maybe TimeData
+yearMonth2 y m = do
+  yt <- year2 y
+  Just $ intersect' (yt, month m)
+
+
 yearMonthDay :: Int -> Int -> Int -> TimeData
 yearMonthDay y m d = intersect' (yearMonth y m, dayOfMonth d)
+
+yearMonthDay2 :: Int -> Int -> Int -> Maybe TimeData
+yearMonthDay2 y m d = do
+  ymt <- yearMonth2 y m
+  Just $ intersect' (ymt, dayOfMonth d)
 
 monthDay :: Int -> Int -> TimeData
 monthDay m d = intersect' (month m, dayOfMonth d)

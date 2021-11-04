@@ -219,6 +219,40 @@ ruleCompositeDuration = Rule
       _ -> Nothing
   }
 
+ruleCompositeDurationCommasAnd :: Rule
+ruleCompositeDurationCommasAnd = Rule
+  { name = "composite <duration> (with ,/and)"
+  , pattern =
+    [ Predicate isNatural
+    , dimension TimeGrain
+    , regex "и"
+    , dimension Duration
+    ]
+  , prod = \case
+      (Token Numeral NumeralData{TNumeral.value = v}:
+       Token TimeGrain g:
+       _:
+       Token Duration dd@DurationData{TDuration.grain = dg}:
+       _) | g > dg -> Just . Token Duration $ duration g (floor v) <> dd
+      _ -> Nothing
+  }
+
+ruleCompositeDurationCommasAnd2 :: Rule
+ruleCompositeDurationCommasAnd2 = Rule
+  { name = "composite <duration> (with ,/and)"
+  , pattern =
+    [ dimension TimeGrain
+    , regex "и"
+    , dimension Duration
+    ]
+  , prod = \case
+      (Token TimeGrain g:
+       _:
+       Token Duration dd@DurationData{TDuration.grain = dg}:
+       _) | g > dg -> Just . Token Duration $ duration g 1 <> dd
+      _ -> Nothing
+  }
+
 rules :: [Rule]
 rules =
   [ rulePositiveDuration
@@ -235,4 +269,6 @@ rules =
   , ruleDuration24h
   , ruleDuration24hN
   , ruleCompositeDuration
+  , ruleCompositeDurationCommasAnd
+  , ruleCompositeDurationCommasAnd2
   ]
