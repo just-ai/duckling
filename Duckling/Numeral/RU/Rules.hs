@@ -339,7 +339,7 @@ ruleThousands :: Rule
 ruleThousands = Rule
   { name = "integer 1000"
   , pattern =
-    [ regex "тыс((яч(а(ми|м|х|)|(е(й|ю|))|и|у|ью|))|)"
+    [ regex "тыс((яч(а(ми|м|х|)|(е(й|ю|))|и|у|ью|))|\\.|)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) -> case Text.toLower match of
@@ -351,14 +351,12 @@ ruleMillionsBillions :: Rule
 ruleMillionsBillions = Rule
   { name = "integer million/billion"
   , pattern =
-    [ regex "(млн|миллион|миллиард)(а(ми|м|х|)|е|о(в|м)|у|ы|)"
+    [ regex "(млн\\.?|миллион|миллиард)(а(ми|м|х|)|е|о(в|м)|у|ы|)"
     ]
   , prod = \tokens -> case tokens of
       (Token RegexMatch (GroupMatch (match:_)):_) -> case Text.toLower match of
-        "млн"  -> double 1e6 >>= withGrain 6 >>= withMultipliable
-        "миллион"  -> double 1e6 >>= withGrain 6 >>= withMultipliable
         "миллиард"  -> double 1e9 >>= withGrain 9 >>= withMultipliable
-        _  -> Nothing
+        _           -> double 1e6 >>= withGrain 6 >>= withMultipliable
       _ -> Nothing
   }
 
