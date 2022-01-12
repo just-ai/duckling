@@ -125,6 +125,7 @@ allExamples = concat
              , "2К"
              , "2 тысячи"
              , "2 тыс"
+             , "2 тыс."
              ]
   , examples (NumeralValue 100000)
              [ "100000"
@@ -132,6 +133,7 @@ allExamples = concat
              , "100К"
              , "100 тысяч"
              , "100 тыс"
+             , "100 тыс."
              ]
   , examples (NumeralValue 3000000)
              [ "3М"
@@ -139,6 +141,7 @@ allExamples = concat
              , "3000000"
              , "3 миллиона"
              , "3 млн"
+             , "3 млн."
              ]
   , examples (NumeralValue 1200000)
              [ "1200000"
@@ -147,12 +150,14 @@ allExamples = concat
              , ".0012Г"
              , "1.2 миллиона"
              , "1.2 млн"
+             , "1.2 млн."
              ]
   , examples (NumeralValue 5000000)
              [ "5000000"
              , "5М"
              , "5000К"
              , "5 млн"
+             , "5 млн."
              , "5 миллионов"
              ]
   , examples (NumeralValue (-1200000))

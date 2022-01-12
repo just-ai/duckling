@@ -47,7 +47,7 @@ ruleRuble :: Rule
 ruleRuble = Rule
   { name = "руб"
   , pattern =
-    [ regex "р(уб(л(ь|ями|ям|ях|я|ю|(е|ё)м|ей|е|и|)|\\.)?|)"
+    [ regex "р(уб(л(ь|ями|ям|ях|я|ю|(е|ё)м|ей|е|и|\\.|)|\\.)?|\\.|)"
     ]
   , prod = \_ -> Just . Token AmountOfMoney $ currencyOnly RUB
   }
