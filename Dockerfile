@@ -39,7 +39,7 @@ ARG GID
 ARG UID
 ARG username
 ARG group
-ARG exposed_port
+ARG exposed_port=9350
 
 RUN groupadd -g $GID $group && \
     useradd -r -u $UID -g $group -m $username && \
