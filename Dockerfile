@@ -17,21 +17,19 @@ RUN stack setup
 
 ADD . .
 
-# NOTE:`stack build` will use as many cores as are available to build
-# in parallel. However, this can cause OOM issues as the linking step
-# in GHC can be expensive. If the build fails, try specifying the
-# '-j1' flag to force the build to run sequentially.
-RUN stack install
-
-FROM redhat/ubi8
+FROM centos:8
 
 ENV LANG C.UTF-8
 
+# fix for "No URLs in mirrorlist"
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+
 RUN yum -y update && \
-  yum -y install pcre pcre-devel gmp tzdata && \
-  yum -y clean all && \
-  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-  cd /usr/lib64 && ln libpcrecpp.so.0.0.1 libpcre.so.3 && chmod 777 libpcre.so.3
+    yum -y install pcre pcre-devel gmp tzdata && \
+    yum -y clean all && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    cd /usr/lib64 && ln libpcrecpp.so.0.0.1 libpcre.so.3 && chmod 777 libpcre.so.3
 
 COPY --from=builder /root/.local/bin/duckling-example-exe /usr/local/bin/
 
