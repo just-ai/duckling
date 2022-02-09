@@ -23,16 +23,9 @@ ADD . .
 # '-j1' flag to force the build to run sequentially.
 RUN stack install
 
-ARG image
-FROM $image
-ARG image
+FROM redhat/ubi8
 
 ENV LANG C.UTF-8
-
-# fix for "No URLs in mirrorlist"
-RUN if [ "$image" == "centos:8" ]; then \
-    sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*; fi
 
 RUN yum -y update && \
     yum -y install pcre pcre-devel gmp tzdata && \
