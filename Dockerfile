@@ -41,6 +41,7 @@ ARG username
 ARG group
 ARG exposed_port=9350
 
+RUN echo $GID
 RUN groupadd -g $GID $group && \
     useradd -r -u $UID -g $group -m $username && \
     chown -R $UID:$GID "/home/$username"
