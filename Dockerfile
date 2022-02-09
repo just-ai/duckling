@@ -25,6 +25,7 @@ RUN stack install
 
 ARG image
 FROM $image
+ARG image
 
 ENV LANG C.UTF-8
 
