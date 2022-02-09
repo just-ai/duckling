@@ -23,7 +23,8 @@ ADD . .
 # '-j1' flag to force the build to run sequentially.
 RUN stack install
 
-FROM centos:8
+ARG image
+FROM $image
 
 ENV LANG C.UTF-8
 
