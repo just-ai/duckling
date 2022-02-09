@@ -29,7 +29,7 @@ FROM $image
 ENV LANG C.UTF-8
 
 # fix for "No URLs in mirrorlist"
-RUN if [ "$image" == "centos:8" ]; then; \
+RUN if [ "$image" == "centos:8" ]; then \
     sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
     sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*; fi
 
